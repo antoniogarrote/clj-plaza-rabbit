@@ -32,7 +32,7 @@ A thin wrapper around the RabbitMQ Java library
 ; ...
 
 ;; closing connection and channels
-(disconnect rabbit)
+(disconnect *rabbit*)
 
 ## Installation
 
