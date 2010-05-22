@@ -48,8 +48,8 @@ A thin wrapper around the RabbitMQ Java library
 
 (.start (Thread. #(do (consume-n-messages *rabbit* :consumer-n "qn" 2) (println "got 2 messages!"))))
 
-(publish *rabbit* :publisher "foo-exchange" "all" (str "hola"))
-(publish *rabbit* :publisher "foo-exchange" "all" (str "hola"))
+(publish *rabbit* :publisher "foo-exchange" "all" "hola")
+(publish *rabbit* :publisher "foo-exchange" "all" "hola")
 
 ;; output:
 ; got 2 messages!
@@ -64,17 +64,18 @@ A thin wrapper around the RabbitMQ Java library
 (def *rabbit* (connect))
 
 (make-channel *rabbit* :consumer-queue)
+(make-channel *rabbit* :publisher)
 (declare-exchange *rabbit* :publisher "foo-exchange")
 (make-queue *rabbit* :consumer-queue "bq" "foo-exchange" "all")
 (def *q* (make-consumer-queue *rabbit* :consumer-queue "bq"))
 
 (.start (Thread. #(doseq [m *q*] (println (str "Got something: " m)))))
 
-(publish *rabbit* :publisher "foo-exchange" "all" (str "hola"))
+(publish *rabbit* :publisher "foo-exchange" "all" "hola")
 ;; output:
 ; Got something: hola
 
-(publish *rabbit* :publisher "foo-exchange" "all" (str "hola"))
+(publish *rabbit* :publisher "foo-exchange" "all" "hola")
 ;; output:
 ; Got something: hola
 
@@ -86,14 +87,14 @@ A thin wrapper around the RabbitMQ Java library
 
 Clojars:
 
-[clj-plaza-rabbit "1.0.0-SNAPSHOT"]
+[clj-plaza-rabbit "1.1.0-SNAPSHOT"]
 
 Maven:
 
 <dependency>
   <groupId>clj-plaza-rabbit</groupId>
   <artifactId>clj-plaza-rabbit</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.1.0-SNAPSHOT</version>
 </dependency>
 
 ## License
