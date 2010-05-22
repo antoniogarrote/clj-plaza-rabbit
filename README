@@ -4,6 +4,7 @@ A thin wrapper around the RabbitMQ Java library
 
 ## Usage
 
+############ Consumers ##############
 (use 'clj-plaza-rabbit.core)
 
 ;; connection, declaration of channels, and one exchange
@@ -30,6 +31,53 @@ A thin wrapper around the RabbitMQ Java library
 ; (a) -> got message: hola 2
 ; (b) -> got message: hola 2
 ; ...
+
+;; closing connection and channels
+(disconnect *rabbit*)
+
+############ Reading N messages ##############
+(use 'clj-plaza-rabbit.core)
+
+;; connection, declaration of channels, and one exchange
+(def *rabbit* (connect))
+
+(make-channel *rabbit* :consumer-n)
+(make-channel *rabbit* :publisher)
+(declare-exchange *rabbit* :publisher "foo-exchange")
+(make-queue *rabbit* :consumer-n "qn" "foo-exchange" "all")
+
+(.start (Thread. #(do (consume-n-messages *rabbit* :consumer-n "qn" 2) (println "got 2 messages!"))))
+
+(publish *rabbit* :publisher "foo-exchange" "all" (str "hola"))
+(publish *rabbit* :publisher "foo-exchange" "all" (str "hola"))
+
+;; output:
+; got 2 messages!
+
+;; closing connection and channels
+(disconnect *rabbit*)
+
+############ Local blocking queue ##############
+(use 'clj-plaza-rabbit.core)
+
+;; connection, declaration of channels, and one exchange
+(def *rabbit* (connect))
+
+(make-channel *rabbit* :consumer-queue)
+(declare-exchange *rabbit* :publisher "foo-exchange")
+(make-queue *rabbit* :consumer-queue "bq" "foo-exchange" "all")
+(def *q* (make-consumer-queue *rabbit* :consumer-queue "bq"))
+
+(.start (Thread. #(doseq [m *q*] (println (str "Got something: " m)))))
+
+(publish *rabbit* :publisher "foo-exchange" "all" (str "hola"))
+;; output:
+; Got something: hola
+
+(publish *rabbit* :publisher "foo-exchange" "all" (str "hola"))
+;; output:
+; Got something: hola
+
 
 ;; closing connection and channels
 (disconnect *rabbit*)

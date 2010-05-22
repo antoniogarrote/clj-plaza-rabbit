@@ -1,4 +1,4 @@
-(defproject clj-plaza-rabbit "1.0.0-SNAPSHOT"
+(defproject clj-plaza-rabbit "1.1.0-SNAPSHOT"
   :description "Yet another client for RabbitMQ"
   :dependencies [[org.clojure/clojure "1.1.0"]
                  [org.clojure/clojure-contrib "1.1.0"]
