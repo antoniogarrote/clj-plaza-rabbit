@@ -1,0 +1,53 @@
+# clj-plaza-rabbit
+
+A thin wrapper around the RabbitMQ Java library
+
+## Usage
+
+(use 'clj-plaza-rabbit.core)
+
+;; connection, declaration of channels, and one exchange
+(def *rabbit* (connect))
+(make-channel *rabbit* :consumera)
+(make-channel *rabbit* :consumerb)
+(make-channel *rabbit* :publisher)
+(declare-exchange *rabbit* :publisher "foo-exchange")
+
+;; Consumer a)
+(make-queue *rabbit* :consumera "qa" "foo-exchange" "all")
+(make-consumer *rabbit* :consumera "qa" #(println (str "(a) -> got message: " %1)))
+
+;; Consumer b)
+(make-queue *rabbit* :consumerb "qb" "foo-exchange" "all")
+(make-consumer *rabbit* :consumerb "qb" #(println (str "(b) -> got message: " %1)))
+
+;; publisher
+(.start (Thread. #(doseq [i (range 0 100)] (publish *rabbit* :publisher "foo-exchange" "all" (str "hola " i)) (Thread/sleep 1000))))
+
+;; output :
+; (a) -> got message: hola 1
+; (b) -> got message: hola 1
+; (a) -> got message: hola 2
+; (b) -> got message: hola 2
+; ...
+
+;; closing connection and channels
+(disconnect rabbit)
+
+## Installation
+
+Clojars:
+
+[clj-plaza-rabbit "1.0.0-SNAPSHOT"]
+
+Maven:
+
+<dependency>
+  <groupId>clj-plaza-rabbit</groupId>
+  <artifactId>clj-plaza-rabbit</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+</dependency>
+
+## License
+
+(MIT/ wadus/ do what you want) license
